@@ -1,11 +1,13 @@
 #include <iostream>
+#include "Number_Bucket.h"
+/*
 class Number_bucket{
   private:
     int arr[];
 
   public:
     Number_bucket(int size){
-      
+
     }
     ~Number_bucket(){
 
@@ -23,7 +25,17 @@ class Number_bucket{
       return 0;
     }
 };
-
+*/
 int main()
 {
+
+  Number_Bucket *bucket = new Number_Bucket();
+
+  bucket->push(5);
+  bucket->push(3);
+  bucket->push(2);
+
+  std::cout << bucket->pop();
+
+  return 0;
 }
