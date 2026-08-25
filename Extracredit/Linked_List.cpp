@@ -8,6 +8,16 @@ LinkedList::LinkedList()
     this->size = 0;
 }
 
+LinkedList::~LinkedList()
+{
+
+    for (int i = 0; i < size; i++)
+    {
+        this->remove_front();
+    }
+    delete this->head;
+}
+
 void LinkedList::insert_front(int value)
 {
     Node *node = new Node(nullptr, value);
@@ -25,6 +35,7 @@ void LinkedList::remove_front()
     Node *node = this->head->get_next();
     this->head->set_next(node->get_next());
     node->set_next(nullptr);
+    delete node;
     size--;
 }
 
