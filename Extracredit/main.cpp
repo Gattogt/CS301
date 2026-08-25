@@ -1,5 +1,7 @@
 #include <iostream>
 #include "Number_Bucket.h"
+
+using namespace std;
 /*
 class Number_bucket{
   private:
@@ -35,7 +37,9 @@ int main()
   bucket->push(3);
   bucket->push(2);
 
-  std::cout << bucket->pop();
+  cout << bucket->pop() << endl;
+
+  delete bucket;
 
   return 0;
 }

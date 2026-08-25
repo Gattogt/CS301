@@ -10,7 +10,7 @@ private:
 
 public:
     Number_Bucket();
-    //~Number_Bucket();
+    ~Number_Bucket();
     void push(int value);
     int pop();
     bool isEmpty();

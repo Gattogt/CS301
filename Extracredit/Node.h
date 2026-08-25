@@ -9,6 +9,7 @@ private:
 
 public:
     Node(Node *next, int value);
+    ~Node();
     void set_next(Node *next);
     void set_value(int value);
     Node *get_next();

@@ -6,6 +6,10 @@ Node::Node(Node *next = nullptr, int value = -1)
     this->value = value;
 }
 
+Node::~Node()
+{
+}
+
 void Node::set_next(Node *next)
 {
     this->next = next;

@@ -1,5 +1,6 @@
 #include "Linked_List.h"
 #include "Node.h"
+#include <iostream>
 
 LinkedList::LinkedList()
 {
@@ -16,6 +17,7 @@ LinkedList::~LinkedList()
         this->remove_front();
     }
     delete this->head;
+    std::cout << "List Successfully Deleted" << std::endl;
 }
 
 void LinkedList::insert_front(int value)

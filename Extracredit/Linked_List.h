@@ -11,6 +11,7 @@ private:
 
 public:
     LinkedList();
+    ~LinkedList();
     void insert_front(int value);
     void remove_front();
     Node *get_front();
