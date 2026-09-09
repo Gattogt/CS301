@@ -4,7 +4,6 @@
 
 LinkedList::LinkedList()
 {
-    this->head = new Node(nullptr, -1);
     this->tail = head;
     this->size = 0;
 }
