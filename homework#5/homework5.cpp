@@ -17,7 +17,10 @@ class StudentType
 {
   public:
     int id;
-    char finalGrade;
+    int finalStudentGrade;
+    int finalProgramingAssigmentGrades;
+    int finalTestGrades;
+    int finalExamGrades;
     string firstName;
     string lastName;
     Assignment *headProgramingAssigment;
@@ -31,8 +34,10 @@ class StudentType
       next = NULL;
       this->firstName = firstName;
       this->lastName = lastName;
-    }
-    void UpdateAssignment(){
+      finalStudentGrade = 0;
+      finalProgramingAssigmentGrades = 0;
+      finalTestGrades = 0;
+      finalExamGrades = 0;
 
     }
 };
@@ -48,8 +53,7 @@ class SemesterProgram{
   int studentLength;
   StudentType* headStudent;
 
-  SemesterProgram(int pa, int ts, int fe, int paP, int tsP, int feP)
-  {
+  SemesterProgram(int pa, int ts, int fe, int paP, int tsP, int feP){
     programingAssignments = pa;
     tests = ts;
     finalExam = fe;
@@ -59,11 +63,80 @@ class SemesterProgram{
     studentLength = 0;
     headStudent = NULL;
   }
+  void ShowProgramingAssigments(int studentId, char type){
+    StudentType* temp = headStudent;
+    if(type == 'P'){
+      cout << "Programing Assignments: \n";
+      while (temp != NULL)
+      {
+        if(temp->id == studentId){
+          Assignment* tempAssignment = temp->headProgramingAssigment;
+          while(tempAssignment != NULL){
+            cout << "Assignment#" << tempAssignment->AssignmentNumber << ": " << tempAssignment->AssignmentValue << endl;
+            tempAssignment = tempAssignment->next;
+          }
+        }
+        temp = temp->next;
+      }
+      cout << "No assignments for this section";
+    }
+    if(type == 'T'){
+      cout << "Test Assignments: \n";
+      while (temp != NULL)
+      {
+        if(temp->id == studentId){
+          Assignment* tempAssignment = temp->headTest;
+          while(tempAssignment != NULL){
+            cout << "Test#" << tempAssignment->AssignmentNumber << ": " << tempAssignment->AssignmentValue << endl;
+            tempAssignment = tempAssignment->next;
+          }
+        }
+        temp = temp->next;
+      }
+      cout << "No assignments for this section";
+    }
+    if(type == 'F'){
+      cout << "Final Test: \n";
+      while (temp != NULL)
+      {
+        if(temp->id == studentId){
+          Assignment* tempAssignment = temp->headFinalExam;
+          while(tempAssignment != NULL){
+            cout << "Test#" << tempAssignment->AssignmentNumber << ": " << tempAssignment->AssignmentValue << endl;
+            tempAssignment = tempAssignment->next;
+          }
+        }
+        temp = temp->next;
+      }
+      cout << "No assignments for this section";
+    }
+  }
+  void ShowGrades(){
+    StudentType* temp = headStudent;
+    while(temp != NULL){
+      cout << "First Name: " << temp->firstName << " Last Name: " << temp->lastName << " Id: " << temp->id << endl;
+      ShowProgramingAssigments(temp->id, 'P');
+      cout << '\n';
+      ShowProgramingAssigments(temp->id, 'T');
+      cout << '\n';
+      ShowProgramingAssigments(temp->id, 'F');
+      cout << '\n';
+      temp = temp->next;
+     } 
+  }
+  void CalculateAndSetStudentFinalGrade(int id){
+    StudentType* temp = headStudent;
+    while(temp != NULL){
+      if(temp->id == id)
+        temp->finalStudentGrade = (temp->finalExamGrades + temp->finalTestGrades + temp->finalProgramingAssigmentGrades);
+      temp = temp->next;
+    }
+  }
   bool isEmpty(){
     return studentLength == 0;
   }
-  void AddStudent(string first, string last){
 
+  void AddStudent(string first, string last){
     StudentType* location = headStudent;
     StudentType* preLoc = NULL;
     while(location != NULL && first.compare(location->firstName) > 0){
@@ -71,18 +144,14 @@ class SemesterProgram{
       location = location->next;
     }
     StudentType* newStudent = new StudentType(first, last);
-    
-    if (preLoc == NULL)
-    {
+    if (preLoc == NULL){
       newStudent->next = headStudent;
       headStudent = newStudent;
     }else{
       newStudent->next = location;
       preLoc->next = newStudent;
     }
-
     studentLength++;
-
     // set all assigments into link lists
     int temp = 0;
     while(temp < programingAssignments){
@@ -126,6 +195,8 @@ class SemesterProgram{
         while(tempAssignment != NULL){
           if(tempAssignment->AssignmentNumber == assignNumb){
             tempAssignment->AssignmentValue = points;
+            tempStudent->finalProgramingAssigmentGrades += points;
+
             break;
           }
           tempAssignment = tempAssignment->next;
@@ -145,6 +216,7 @@ class SemesterProgram{
         while(tempTest != NULL){
           if(tempTest->AssignmentNumber == assignNumb){
             tempTest->AssignmentValue = points;
+            tempStudent->finalTestGrades += points;
             break;
           }
           tempTest = tempTest->next;
@@ -164,6 +236,7 @@ class SemesterProgram{
         while(tempFinalExam != NULL){
           if(tempFinalExam->AssignmentNumber == assignNumb){
             tempFinalExam->AssignmentValue = points;
+            tempStudent->finalExamGrades += points;
             break;
           }
           tempFinalExam = tempFinalExam->next;
@@ -181,9 +254,6 @@ int main(){
   string message = "Please choose one of the following:\Enter N to set up a new semester.\Enter A to add a new student.\Enter P to record programming assignment grade for all students.\Enter T to record test grade for all students.\Enter F to record Final exam grade for all students.\nEnter C to change a grade for a particular student.\nEnter G to Calculate final grade.\nEnter Output the grade data, ordered alphabetically by name (last name/first name) or by student number (in increasing order).\nEnter Q to Quit";
   while (true)
   {
-      // ELIMINATE CURRENT SEMESTER
-     //   write
-    //
     cout << message<<": ";
     cin >> letter;
     if(letter == 'S'){
@@ -205,7 +275,9 @@ int main(){
       cin >> testP;
       cout << "Please enter an iterger to represent the percentage that programing Assignments will account for this semester : ";
       cin >> finalExP;
-      semester = new SemesterProgram(programingAssiments,test,finalEx,programingAssimentsP,testP,finalExP);
+      
+      
+      semester = new SemesterProgram(programingAssiments, test, finalEx, programingAssimentsP, testP, finalExP);
     }
     if(letter == 'A'){
       string firstName;
@@ -272,6 +344,51 @@ int main(){
       }
       else
         cout << "The input: " << finalExamNumber << "is invalid for the range of final exams";
+    }
+    if(letter == 'C'){
+      int studentId;
+      int newGrade;
+      char type;
+      cout << "You are about to change a grade;" << endl;
+      cout << "Please introduce the student id: ";
+      cin >> studentId;
+      cout << "Please introduce the new grade: ";
+      cin >> newGrade;
+      cout << "Please indicate the type of grade you would like to change: P for programing assignment, T for test and F for final exam: ";
+      cin >> type;
+      if(type == 'P'){
+        int assigmnentNumber;
+        cout << "Please indicate which programing assigment number would you like to change: ";
+        cin >> assigmnentNumber;
+        semester->searchByIdAndUpdateAssignment(studentId, assigmnentNumber, newGrade);
+      }
+      if(type == 'T'){
+        int assigmnentNumber;
+        cout << "Please indicate which test number you would you like to change: ";
+        cin >> assigmnentNumber;
+        semester->searchByIdAndUpdateTest(studentId, assigmnentNumber, newGrade);
+      }
+      if(type == 'F'){
+        int assigmnentNumber;
+        cout << "Please indicate the final exam number that you would like to change: ";
+        cin >> assigmnentNumber;
+        semester->searchByIdAndUpdateFinalExam(studentId, assigmnentNumber, newGrade);
+      }
+    }
+    if(letter == 'G'){
+      int studentId;
+      cout << "Please enter the student id for which you would like to calculate final grade: ";
+      cin >> studentId;
+      semester->CalculateAndSetStudentFinalGrade(studentId);
+    }
+    if(letter == 'O'){
+      cout << "This are the student grades: ";
+      semester->ShowGrades();
+    }
+    if(letter = 'Q'){
+      // SAVE THE CONTENT INTO A FILE.
+      // DESTROY ALL NODES.
+      break;
     }
   }
 }
