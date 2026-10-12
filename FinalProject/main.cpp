@@ -16,6 +16,8 @@ static int idCounter = 0;
 static int assignmentnum = 0;
 char letter;
 
+const string FILENAME = "task.csv";
+
 // maybe we need a total points and the amount of points they actually got
 // int assignmenttotalpoints
 // int assigmentscoredpoints
@@ -65,6 +67,65 @@ public:
         this->assignments = NULL;
     }
 
+    void Update_Tasks_With_CSV()
+    {
+        std::ifstream file(FILENAME);
+
+        string line;
+        string task;
+        string tempDifficulty;
+        string dueDate;
+        string temp_completed;
+
+        int difficulty;
+        bool completed;
+        // First check if the file even opened successfully
+        if (!file.is_open())
+        {
+            std::cout << "File could not be opened." << std::endl;
+            return;
+        }
+
+        // Peek at the first character
+        if (file.peek() == std::ifstream::traits_type::eof())
+        {
+            return;
+        }
+        else
+        {
+            while (getline(file, line))
+            {
+                stringstream ss(line);
+
+                getline(ss, task, ',');
+                getline(ss, tempDifficulty, ',');
+                getline(ss, dueDate, ',');
+                getline(ss, temp_completed);
+
+                difficulty = stoi(tempDifficulty);
+                istringstream(temp_completed) >> boolalpha >> completed;
+
+                Assignment *new_assignment = new Assignment();
+                new_assignment->completed = completed;
+                new_assignment->AssignmentNumber = assignmentnum++;
+                new_assignment->AssignmentName = task;
+                new_assignment->difficulty = difficulty;
+                new_assignment->dueDate = dueDate; // "9/30/26"
+                if (this->assignments == NULL)
+                {
+                    this->assignments = new_assignment;
+                }
+                else // insert in the front, it's not an ordered list for now so it's ok
+                {
+                    new_assignment->next = this->assignments;
+                    this->assignments = new_assignment;
+                }
+            }
+        }
+
+        file.close();
+    }
+
     /*
     Helper function to turn number difficulty into string for printing
     */
@@ -109,6 +170,18 @@ public:
 
     void Add_Task(string name, int difficulty, string dueDate)
     {
+        fstream file(FILENAME, ios::app);
+        if (!file.is_open())
+        {
+            cout << "error, file couldn't open" << endl;
+            return;
+        }
+        else
+        {
+            file << name << "," << difficulty << "," << dueDate << "\n";
+        }
+        file.close();
+
         Assignment *new_assignment = new Assignment();
         new_assignment->completed = false;
         new_assignment->AssignmentNumber = assignmentnum++;
@@ -128,6 +201,7 @@ public:
 
     void Remove_Task(string name)
     {
+
         bool found = false;
         Assignment *predAssignment = NULL;
         Assignment *search = this->assignments;
@@ -162,6 +236,23 @@ public:
             cout << "Successfully Deleted" << endl // debugging line making sure we know if an item is deleted
                  << endl;
         }
+
+        fstream file(FILENAME, ios::out | ios::trunc);
+        if (!file.is_open())
+        {
+            cout << "error, file couldn't open" << endl;
+            return;
+        }
+        else
+        {
+            Assignment *task = this->assignments;
+            while (task != NULL)
+            {
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                task = task->next;
+            }
+        }
+        file.close();
     }
 
     Assignment *Find_Task(string name)
@@ -205,7 +296,25 @@ public:
         else
         {
             cout << "Task could not be edited as the task does not exist" << endl;
+            return;
         }
+
+        fstream file(FILENAME, ios::out | ios::trunc);
+        if (!file.is_open())
+        {
+            cout << "error, file couldn't open" << endl;
+            return;
+        }
+        else
+        {
+            Assignment *task = this->assignments;
+            while (task != NULL)
+            {
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                task = task->next;
+            }
+        }
+        file.close();
     }
 
     void Mark_As_Complete(string name)
@@ -232,6 +341,23 @@ public:
                 search->completed = true;
             }
         }
+
+        fstream file(FILENAME, ios::out | ios::trunc);
+        if (!file.is_open())
+        {
+            cout << "error, file couldn't open" << endl;
+            return;
+        }
+        else
+        {
+            Assignment *task = this->assignments;
+            while (task != NULL)
+            {
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                task = task->next;
+            }
+        }
+        file.close();
     }
 
     void Display_Task() // for debugging purposes while we do not actually have front end to test with
@@ -268,6 +394,7 @@ public:
 int main()
 {
     StudentType *user = new StudentType("Kiona", "Peni");
+    user->Update_Tasks_With_CSV();
 
     cout << "Hello Welcome to our Student Task Manager" << endl;
     cout << "Our task manager allows you to add, remove, and edit tasks!" << endl;
