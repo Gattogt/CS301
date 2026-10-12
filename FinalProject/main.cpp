@@ -3,10 +3,11 @@ Author: Kiona Peni
 date: 9/29/26
 desc: this is a prototype for our task manager, I don't know how to connect
 the front end with the backend
-but I'm going to levae that into the trust hands of my team members
+but I'm going to leave that into the trusty hands of my team members
 */
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -15,23 +16,25 @@ static int idCounter = 0;
 static int assignmentnum = 0;
 char letter;
 
-// ALL LINKED LIST STUFF AND ID STUFF WILL BE REPLACED WITH CROW STUFF
-
 // maybe we need a total points and the amount of points they actually got
 // int assignmenttotalpoints
 // int assigmentscoredpoints
 struct Assignment
 {
+
+    string AssignmentName;
     int difficulty; // 0 is easy, 1 is medium, 2 is hard
     bool completed;
     int AssignmentNumber;
-    string AssignmentName;
-    int AssignmentScoredPoints;
-    int AssignmentValue; // this is the total points the assignment is worth
     string dueDate;
-    char assignmentGrade;
     Assignment *next;
-    string assignmentType; // "test" "assignment" "final exam"
+
+    // commenting out grade related stuff for now because I'm not sure we need to keep track of all of this
+
+    // int AssignmentScoredPoints;
+    // int AssignmentValue; // this is the total points the assignment is worth
+    // char assignmentGrade;
+    // string assignmentType; // "test" "assignment" "final exam"
 };
 
 class StudentType
@@ -62,44 +65,64 @@ public:
         this->assignments = NULL;
     }
 
-    Assignment *Find_Task(string name)
+    /*
+    Helper function to turn number difficulty into string for printing
+    */
+    string difficulty_to_string(int difficulty)
     {
-
-        Assignment *predLoc = NULL;
-        Assignment *location = this->assignments;
-
-        while (location != NULL)
+        switch (difficulty)
         {
-            if (location->AssignmentName == name)
-            {
-                return location;
-            }
-        }
+        case 1:
+            return "easy";
 
-        cout << "assignment not found" << endl;
-        return NULL;
+        case 2:
+            return "medium";
+
+        case 3:
+            return "hard";
+        default:
+            cout << "error: invalid difficulty" << endl;
+            return "-1";
+        }
     }
 
-    void Add_Task(string name, int points, string dueDate, int difficulty = 0)
+    int difficulty_to_int(string difficulty)
+    {
+        if (difficulty == "easy")
+        {
+            return 1;
+        }
+        else if (difficulty == "medium")
+        {
+            return 2;
+        }
+        else if (difficulty == "hard")
+        {
+            return 3;
+        }
+        else
+        {
+            cout << "error: invalid difficulty" << endl;
+            return -1;
+        }
+    }
+
+    void Add_Task(string name, int difficulty, string dueDate)
     {
         Assignment *new_assignment = new Assignment();
-
-        new_assignment->difficulty = difficulty;
         new_assignment->completed = false;
-        new_assignment->AssignmentNumber = ++assignmentnum;
+        new_assignment->AssignmentNumber = assignmentnum++;
         new_assignment->AssignmentName = name;
-        new_assignment->AssignmentValue = points;
+        new_assignment->difficulty = difficulty;
         new_assignment->dueDate = dueDate; // "9/30/26"
         if (this->assignments == NULL)
         {
             this->assignments = new_assignment;
         }
-        else
+        else // insert in the front, it's not an ordered list for now so it's ok
         {
-            Assignment *temp;
-            temp = this->assignments->next;
-            this->assignments->next = new_assignment;
-            new_assignment->next = temp;
+            new_assignment->next = this->assignments;
+            this->assignments = new_assignment;
         }
     }
 
@@ -141,17 +164,8 @@ public:
         }
     }
 
-    void Edit_Task(Assignment *task, string name = "", int difficulty = 0)
+    Assignment *Find_Task(string name)
     {
-        return;
-    }
-
-    // ADDME: Edit_Task
-    // parameter: assignment name anything else the user would want to edit
-
-    void Mark_As_Complete(string name)
-    {
-
         bool found = false;
         Assignment *predAssignment = NULL;
         Assignment *search = this->assignments;
@@ -161,15 +175,62 @@ public:
             if (search->AssignmentName == name)
             {
                 found = true;
-                break;
+                return search;
             }
             predAssignment = search;
             search = search->next;
         }
+        return NULL;
+    }
+    // ADDME: Edit_Task
+    // parameter: assignment name anything else the user would want to edit
 
-        if (found)
+    void Edit_Task(Assignment *task, string newName = "", int difficulty = -1, string dueDate = "")
+    {
+        if (task != NULL)
         {
-            search->completed = true;
+            if (newName != "")
+            {
+                task->AssignmentName = newName;
+            }
+            if (difficulty != -1)
+            {
+                task->difficulty = difficulty;
+            }
+            if (dueDate != "")
+            {
+                task->dueDate = dueDate;
+            }
+        }
+        else
+        {
+            cout << "Task could not be edited as the task does not exist" << endl;
+        }
+    }
+
+    void Mark_As_Complete(string name)
+    {
+        if (this->assignments != NULL)
+        {
+            bool found = false;
+            Assignment *predAssignment = NULL;
+            Assignment *search = this->assignments;
+
+            while (search != NULL && !found) // search list for assignment
+            {
+                if (search->AssignmentName == name)
+                {
+                    found = true;
+                    break;
+                }
+                predAssignment = search;
+                search = search->next;
+            }
+
+            if (found)
+            {
+                search->completed = true;
+            }
         }
     }
 
@@ -187,14 +248,14 @@ public:
                 cout << location->AssignmentName << ":" << endl;
                 if (location->completed)
                 {
-                    cout << "COMPLETE";
-                    cout << location->AssignmentScoredPoints << "/" << location->AssignmentValue << endl;
+                    cout << "COMPLETE" << endl;
+                    cout << "Difficulty: " << this->difficulty_to_string(location->difficulty) << endl;
                     cout << "Due By " << location->dueDate << endl;
                 }
                 else
                 {
-                    cout << "NOT COMPLTE";
-                    cout << "?/" << location->AssignmentValue << endl;
+                    cout << "NOT COMPLTE" << endl;
+                    cout << "Difficulty: " << this->difficulty_to_string(location->difficulty) << endl;
                     cout << "Due by " << location->dueDate << endl;
                 }
                 cout << endl;
@@ -206,17 +267,134 @@ public:
 
 int main()
 {
-
     StudentType *user = new StudentType("Kiona", "Peni");
 
-    user->Add_Task("Homework 5", 10, "10/1/2026");
-    user->Add_Task("Lab 2", 10, "9/17/2026");
-    user->Add_Task("Test 1", 100, "11/1/2026");
-    user->Display_Task();
+    cout << "Hello Welcome to our Student Task Manager" << endl;
+    cout << "Our task manager allows you to add, remove, and edit tasks!" << endl;
+    cout << "Then when you complete your tasks you can mark them as complete!!" << endl;
 
-    user->Remove_Task("Lab 1");
-    user->Remove_Task("Lab 2");
-    user->Display_Task();
+    string action = "";
+    string task;
+    string difficulty;
+    int difficulty_num;
+    string dueDate;
+    Assignment *task_to_edit;
+
+    while (action != "exit")
+    {
+
+        cout << "if you would like to add a task enter 'a'" << endl;
+        cout << "if you would like to remove a task enter 'r'" << endl;
+        cout << "if you would like to edit a task enter 'e'" << endl;
+        cout << "if you would like to mark a task as complete enter 'c'" << endl;
+        cout << "if you would liek to exit the program enter 'exit'" << endl;
+
+        getline(cin, action);
+
+        if (action == "a")
+        {
+            cout << "You are adding a task!" << endl;
+            cout << "if you don't want to do that enter '-1', otherwise please enter the name of your task" << endl;
+            getline(cin, task);
+            if (task == "-1")
+            {
+                continue;
+            }
+            cout << "Now enter a difficulty for this task ('easy'/'medium'/'hard')" << endl;
+            getline(cin, difficulty);
+            while (difficulty != "easy" && difficulty != "medium" && difficulty != "hard")
+            {
+                cout << "that's not a valid difficulty please enter either 'easy', 'medium', or 'hard'" << endl;
+                getline(cin, difficulty);
+            }
+            cout << "Now please enter a due date for your task like this 'MM/DD/YYYY'" << endl;
+            getline(cin, dueDate);
+
+            // for this I'm just trusting the uesr inputs it how I would like them to
+            // it really doesn't matter because we aren't sorting anyway
+
+            user->Add_Task(task, user->difficulty_to_int(difficulty), dueDate);
+        }
+
+        else if (action == "r")
+        {
+            cout << "You are removing a task" << endl;
+            cout << "if you don't want to do that enter '-1', otherwise please enter the name of the task you would like to remove" << endl;
+            getline(cin, task);
+
+            if (task == "-1")
+            {
+                continue;
+            }
+
+            user->Remove_Task(task);
+        }
+
+        else if (action == "e")
+        {
+            cout << "You are editing a task!" << endl;
+            cout << "if you don't want to do that enter '-1', otherwise enter the name of the tast you would like to edit" << endl;
+            getline(cin, task);
+
+            if (task == "-1")
+            {
+                continue;
+            }
+
+            task_to_edit = user->Find_Task(task);
+
+            cout << "please enter the new name of your task, if you don't want to edit press enter" << endl;
+            getline(cin, task);
+            if (task == "-1")
+            {
+                continue;
+            }
+            cout << "Now enter a new difficulty for this task ('easy'/'medium'/'hard'), , if you don't want to edit press enter" << endl;
+            getline(cin, difficulty);
+            while (difficulty != "" && difficulty != "easy" && difficulty != "medium" && difficulty != "hard")
+            {
+                cout << "that's not a valid difficulty please enter either 'easy', 'medium', or 'hard'" << endl;
+                getline(cin, difficulty);
+            }
+            if (difficulty == "")
+            {
+                difficulty_num = -1;
+            }
+            else
+            {
+                difficulty_num = user->difficulty_to_int(difficulty);
+            }
+            cout << "Now please enter a due date for your task like this 'MM/DD/YYYY', if you don't want to edit press enter" << endl;
+            getline(cin, dueDate);
+
+            user->Edit_Task(task_to_edit, task, difficulty_num, dueDate);
+        }
+
+        else if (action == "c")
+        {
+            cout << "You are marking a task as complete, CONGRADULATIONS!!" << endl;
+            cout << "if you do not want to do that enter -1, otherwise enter the name of the task you would like to mark as complete" << endl;
+            if (task == "-1")
+            {
+                continue;
+            }
+            getline(cin, task);
+
+            user->Mark_As_Complete(task);
+        }
+
+        else if (action == "exit")
+        {
+            cout << "Goodbye, thank you for using our task manager" << endl;
+        }
+
+        else
+        {
+            cout << "unfortunately that is an invalid command please try again T_T" << endl;
+        }
+
+        user->Display_Task();
+    }
 
     return 0;
 }
