@@ -15,6 +15,8 @@ static int idCounter = 0;
 static int assignmentnum = 0;
 char letter;
 
+// ALL LINKED LIST STUFF AND ID STUFF WILL BE REPLACED WITH CROW STUFF
+
 // maybe we need a total points and the amount of points they actually got
 // int assignmenttotalpoints
 // int assigmentscoredpoints
@@ -60,11 +62,31 @@ public:
         this->assignments = NULL;
     }
 
-    void Add_Task(string name, int points, string dueDate)
+    Assignment *Find_Task(string name)
+    {
+
+        Assignment *predLoc = NULL;
+        Assignment *location = this->assignments;
+
+        while (location != NULL)
+        {
+            if (location->AssignmentName == name)
+            {
+                return location;
+            }
+        }
+
+        cout << "assignment not found" << endl;
+        return NULL;
+    }
+
+    void Add_Task(string name, int points, string dueDate, int difficulty = 0)
     {
         Assignment *new_assignment = new Assignment();
+
+        new_assignment->difficulty = difficulty;
         new_assignment->completed = false;
-        new_assignment->AssignmentNumber = assignmentnum++;
+        new_assignment->AssignmentNumber = ++assignmentnum;
         new_assignment->AssignmentName = name;
         new_assignment->AssignmentValue = points;
         new_assignment->dueDate = dueDate; // "9/30/26"
@@ -117,6 +139,11 @@ public:
             cout << "Successfully Deleted" << endl // debugging line making sure we know if an item is deleted
                  << endl;
         }
+    }
+
+    void Edit_Task(Assignment *task, string name = "", int difficulty = 0)
+    {
+        return;
     }
 
     // ADDME: Edit_Task
@@ -179,6 +206,7 @@ public:
 
 int main()
 {
+
     StudentType *user = new StudentType("Kiona", "Peni");
 
     user->Add_Task("Homework 5", 10, "10/1/2026");
