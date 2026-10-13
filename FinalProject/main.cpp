@@ -178,7 +178,7 @@ public:
         }
         else
         {
-            file << name << "," << difficulty << "," << dueDate << "\n";
+            file << name << "," << difficulty << "," << dueDate << "," << false << "\n";
         }
         file.close();
 
@@ -248,7 +248,15 @@ public:
             Assignment *task = this->assignments;
             while (task != NULL)
             {
-                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << ",";
+                if (task->completed)
+                {
+                    file << "true" << "\n";
+                }
+                else
+                {
+                    file << "false" << "\n";
+                }
                 task = task->next;
             }
         }
@@ -310,7 +318,15 @@ public:
             Assignment *task = this->assignments;
             while (task != NULL)
             {
-                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << ",";
+                if (task->completed)
+                {
+                    file << "true" << "\n";
+                }
+                else
+                {
+                    file << "false" << "\n";
+                }
                 task = task->next;
             }
         }
@@ -353,7 +369,15 @@ public:
             Assignment *task = this->assignments;
             while (task != NULL)
             {
-                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << "\n";
+                file << task->AssignmentName << "," << task->difficulty << "," << task->dueDate << ",";
+                if (task->completed)
+                {
+                    file << "true" << "\n";
+                }
+                else
+                {
+                    file << "false" << "\n";
+                }
                 task = task->next;
             }
         }
@@ -369,6 +393,7 @@ public:
         }
         else
         {
+            cout << endl;
             while (location != NULL)
             {
                 cout << location->AssignmentName << ":" << endl;
@@ -409,6 +434,11 @@ int main()
 
     while (action != "exit")
     {
+
+        if (action != "exit")
+        {
+            user->Display_Task();
+        }
 
         cout << "if you would like to add a task enter 'a'" << endl;
         cout << "if you would like to remove a task enter 'r'" << endl;
@@ -519,8 +549,6 @@ int main()
         {
             cout << "unfortunately that is an invalid command please try again T_T" << endl;
         }
-
-        user->Display_Task();
     }
 
     return 0;
