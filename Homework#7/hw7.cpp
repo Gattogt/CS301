@@ -9,7 +9,8 @@
 using namespace std;
 string line;
 string text;
-struct Node{
+struct Node
+{
   int value;
   Node *next;
 };
@@ -20,21 +21,26 @@ struct TreeNode
   TreeNode *left = NULL;
 };
 
-class MYBTS{
-  public:
-   TreeNode* root;
-   Node *rear;
-   MYBTS(){
-     root = NULL;
-     rear = NULL;
-   }
-   bool isEmpty(){
+class MYBTS
+{
+public:
+  TreeNode *root;
+  Node *rear;
+  MYBTS()
+  {
+    root = NULL;
+    rear = NULL;
+  }
+  bool isEmpty()
+  {
     return rear == NULL;
   }
-  void Enqueue(int value){
-    Node* newNode = new Node;
+  void Enqueue(int value)
+  {
+    Node *newNode = new Node;
     newNode->value = value;
-    if (rear == NULL){
+    if (rear == NULL)
+    {
       rear = newNode;
       newNode->next = rear;
       return;
@@ -44,12 +50,15 @@ class MYBTS{
     rear = newNode;
     newNode->next = temp;
   }
-  int Dequeue(){
-    if(rear == NULL){
+  int Dequeue()
+  {
+    if (rear == NULL)
+    {
       cout << "The queue is Empty" << endl;
       return -1;
     }
-    if(rear == rear->next){
+    if (rear == rear->next)
+    {
       Node *temp = rear->next;
       rear = NULL;
       return temp->value;
@@ -58,19 +67,23 @@ class MYBTS{
     rear->next = temp->next;
     return temp->value;
   }
-  void fillMyQueue(TreeNode* tree){
-    if(tree != NULL){
-      if(tree->left != NULL){
+  void fillMyQueue(TreeNode *tree)
+  {
+    if (tree != NULL)
+    {
+      if (tree->left != NULL)
+      {
         fillMyQueue(tree->left);
       }
       Enqueue(tree->value);
-      if(tree->right != NULL){
+      if (tree->right != NULL)
+      {
         fillMyQueue(tree->right);
       }
     }
     else
     {
-      cout << "Tree is empty"<<endl;
+      cout << "Tree is empty" << endl;
     }
 
     // if(tree == NULL){
@@ -81,66 +94,93 @@ class MYBTS{
     //   Enqueue(tree->value);
     // }
     // else{
-    //    Enqueue(tree->value); 
+    //    Enqueue(tree->value);
     // }
     // fillMyQueue(tree->left);
     // fillMyQueue(tree->right);
-    
   }
-    void print(){
-      Node *temp = rear;
-      int count = 0;
-      while (count != 100){
-        temp = temp->next;
-        cout <<temp->value<<endl;
-        count++;
-      }
-    }
+  void print_and_dequeue()
+  {
 
-   int CountNodes(TreeNode* tree){
-      if(tree == NULL){
-        return 0;
-      }
-      return CountNodes(tree->left) + CountNodes(tree->right) + 1;
+    // Node *temp = rear;
+    // int count = 0;
+    while (rear != NULL)
+    {
+      cout << Dequeue() << endl;
     }
-    int GetLength(){
-      return CountNodes(root);
-   }
-   bool Insert(int value){
-     TreeNode *newTreeNode = new TreeNode;
-     newTreeNode->value = value;
-     TreeNode *temp = root;
-     if(root == NULL){
+  }
+
+  int CountNodes(TreeNode *tree)
+  {
+    if (tree == NULL)
+    {
+      return 0;
+    }
+    return CountNodes(tree->left) + CountNodes(tree->right) + 1;
+  }
+  int GetLength()
+  {
+    return CountNodes(root);
+  }
+  bool Insert(int value)
+  {
+    TreeNode *newTreeNode = new TreeNode;
+    newTreeNode->value = value;
+    TreeNode *temp = root;
+    if (root == NULL)
+    {
       root = newTreeNode;
-     }
-     while(temp != NULL){
-      if(newTreeNode->value < temp->value){
-        if(temp->left == NULL){
+    }
+    while (temp != NULL)
+    {
+      if (newTreeNode->value < temp->value)
+      {
+        if (temp->left == NULL)
+        {
           temp->left = newTreeNode;
           break;
         }
-        else{temp = temp->left;}
-      }else if(newTreeNode-> value > temp->value){
-        if(temp->right == NULL){
+        else
+        {
+          temp = temp->left;
+        }
+      }
+      else if (newTreeNode->value > temp->value)
+      {
+        if (temp->right == NULL)
+        {
           temp->right = newTreeNode;
           break;
         }
-        else{temp = temp->right;}
-      }else{return false;}
-     }
-     return true;
-   }
+        else
+        {
+          temp = temp->right;
+        }
+      }
+      else
+      {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 int main()
 {
-  MYBTS* bt = new MYBTS;
+  MYBTS *bt = new MYBTS;
   ifstream numfile("numfile.txt");
 
-  while(getline(numfile, line)){
+  cout << "Storing 100 values into our tree..." << endl;
+  while (getline(numfile, line))
+  {
     bt->Insert(stoi(line));
   }
   numfile.close();
+
+  cout << "Filling the queue with those values..." << endl;
   bt->fillMyQueue(bt->root);
-  bt->print();
+
+  cout << "printing those values out:" << endl;
+  bt->print_and_dequeue();
 }
